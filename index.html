@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>🎄 Christmas Clue Hunt 2025 🎄</title>
+  <style>
+    body {
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      margin: 0;
+      background: linear-gradient(to bottom, #e0f7fa, #b3e5fc);
+      color: #2e3d49;
+    }
+    header {
+      background: #b11226;
+      color: #fffacd;
+      padding: 20px;
+      text-align: center;
+      font-size: 28px;
+      font-weight: bold;
+      text-shadow: 2px 2px #4a0000;
+    }
+    .container {
+      padding: 20px;
+      max-width: 900px;
+      margin: auto;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    }
+    #time {
+      font-size: 48px;
+      text-align: center;
+      margin: 20px 0;
+      color: #b11226;
+      font-weight: bold;
+    }
+    button {
+      padding: 12px 20px;
+      font-size: 16px;
+      margin: 5px;
+      cursor: pointer;
+      border-radius: 8px;
+      border: none;
+      background-color: #ff6f61;
+      color: white;
+      font-weight: bold;
+      box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+      transition: transform 0.1s;
+    }
+    button:hover {
+      transform: scale(1.1);
+      background-color: #ff3d2e;
+    }
+    .panel {
+      background: #fff8e1;
+      padding: 15px;
+      margin-top: 15px;
+      border-radius: 10px;
+      display: none;
+      box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
+    }
+    .hint-count {
+      font-weight: bold;
+      margin-top: 10px;
+      color: #b11226;
+    }
+    .clue-buttons button {
+      margin: 3px;
+      background-color: #4caf50;
+    }
+    input[type="number"] {
+      padding: 10px;
+      font-size: 16px;
+      width: 150px;
+      border-radius: 8px;
+      border: 1px solid #b11226;
+    }
+    .score {
+      font-size: 22px;
+      margin-top: 15px;
+      text-align: center;
+      color: #b11226;
+      font-weight: bold;
+    }
+    #scorePage {
+      text-align: center;
+      animation: fadeIn 2s ease-in;
+    }
+    @keyframes fadeIn {
+      from {opacity: 0;}
+      to {opacity: 1;}
+    }
+  </style>
+</head>
+<body>
+
+<header>🎄 Christmas Clue Hunt 2025 🎄</header>
+
+<div class="container" id="mainPage">
+
+  <div id="time">00:00:00</div>
+
+  <div style="text-align:center;">
+    <button onclick="startTimer()">Start</button>
+    <button onclick="stopTimer()">Stop</button>
+    <button onclick="togglePanel('infoPanel')">Info</button>
+    <button onclick="togglePanel('hintsPanel')">Hints</button>
+  </div>
+
+  <div class="panel" id="infoPanel">
+    <h3>Game Info</h3>
+    <p>
+      Welcome to the Christmas Clue Hunt 2025! Follow the clues, find the hidden treasures, and see if you can be the fastest elf in the North Pole!
+    </p>
+  </div>
+
+  <div class="panel" id="hintsPanel">
+    <h3>Hints</h3>
+
+    <div class="clue-buttons">
+      <strong>Clue 1:</strong><br />
+      <button onclick="useHint('c1h1','Clue 1 – Hint 1: Coordinates')">Hint 1</button>
+      <button onclick="useHint('c1h2','Clue 1 – Hint 2: Longitude and Latitude')">Hint 2</button>
+      <button onclick="useHint('c1h3','Clue 1 – Hint 3: Use the longitude and latitude coordinates to find the answer')">Hint 3</button>
+      <br /><br />
+
+      <strong>Clue 2:</strong><br />
+      <button onclick="useHint('c2h1','Clue 2 – Hint 1: Visit Link or Scan QR Code')">Hint 1</button>
+      <button onclick="useHint('c2h2','Clue 2 – Hint 2: Use format: Page.Deffinition')">Hint 2</button>
+      <br /><br />
+
+      <strong>Clue 3:</strong><br />
+      <button onclick="useHint('c3h1','Clue 3 – Hint 1: Look at the logo and find the product')">Hint 1</button>
+      <button onclick="useHint('c3h2','Clue 3 – Hint 2: Are in the newest modification of 4 Raspberry Rd. Bloomington, Il. 61704')">Hint 2</button>
+    </div>
+
+    <p class="hint-count">Hints Used: <span id="hintCount">0</span></p>
+    <p id="hintText"></p>
+  </div>
+
+  <hr />
+
+  <h3>Finish Hunt</h3>
+  <p>Enter total money collected:</p>
+  <input type="number" id="money" placeholder="$" />
+  <br /><br />
+  <button onclick="finishHunt()">Finish Hunt</button>
+
+</div>
+
+<div class="container" id="scorePage" style="display:none;">
+  <h2>🎉 Congratulations! 🎉</h2>
+  <div class="score" id="finalTime"></div>
+  <div class="score" id="finalHints"></div>
+  <div class="score" id="finalMoney"></div>
+  <div class="score" id="finalGrade"></div>
+  <p style="font-size:24px; color:#ff3d2e;">🎁 You have completed the Christmas Clue Hunt 2025! Merry Christmas! 🎄✨</p>
+</div>
+
+<script>
+  let interval;
+  let hintCount = 0;
+  const usedHints = new Set();
+
+  function getElapsed() {
+    const start = localStorage.getItem('startTime');
+    const stopped = localStorage.getItem('stoppedTime');
+    if (!start) return 0;
+    return stopped ? parseInt(stopped) : Date.now() - parseInt(start);
+  }
+
+  function format(ms) {
+    let s = Math.floor(ms / 1000);
+    let h = Math.floor(s / 3600);
+    let m = Math.floor((s % 3600) / 60);
+    s = s % 60;
+    return `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+  }
+
+  function update() {
+    document.getElementById('time').textContent = format(getElapsed());
+  }
+
+  function startTimer() {
+    if (!localStorage.getItem('startTime')) {
+      localStorage.setItem('startTime', Date.now());
+    }
+    localStorage.removeItem('stoppedTime');
+  }
+
+  function stopTimer() {
+    localStorage.setItem('stoppedTime', getElapsed());
+  }
+
+  function togglePanel(id) {
+    const panel = document.getElementById(id);
+    panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+  }
+
+  function useHint(id, text) {
+    if (usedHints.has(id)) return;
+    usedHints.add(id);
+    if(hintCount < 5) {
+      hintCount++;
+    } else {
+      alert('You can only use 5 hints total!');
+      return;
+    }
+    document.getElementById('hintCount').textContent = hintCount;
+    document.getElementById('hintText').textContent = text;
+  }
+
+  function finishHunt() {
+    const money = parseInt(document.getElementById('money').value, 10);
+
+    if (money !== 50) {
+      alert('You must enter the correct earnings ($50) to finish the hunt.');
+      return;
+    }
+
+    stopTimer();
+    document.getElementById('mainPage').style.display = 'none';
+    document.getElementById('scorePage').style.display = 'block';
+
+    const elapsedMs = getElapsed();
+    const time = format(elapsedMs);
+
+    let grade;
+    const minutes = elapsedMs / 1000 / 60;
+    if(minutes <= 15 && hintCount <= 5) grade = 'A';
+    else if(minutes <= 30 && hintCount <= 5) grade = 'B';
+    else grade = 'C';
+
+    document.getElementById('finalTime').textContent = '⏱ Time: ' + time;
+    document.getElementById('finalHints').textContent = '💡 Hints Used: ' + hintCount;
+    document.getElementById('finalGrade').textContent = '🏆 Grade: ' + grade;
+
+    localStorage.clear();
+  }
+
+  setInterval(update, 1000);
+</script>
+
+</body>
+</html>
