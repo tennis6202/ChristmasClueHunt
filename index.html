@@ -161,8 +161,10 @@
 
 <script>
   let interval;
-  let hintCount = 0;
-  const usedHints = new Set();
+  // Load hintCount from localStorage
+  let hintCount = parseInt(localStorage.getItem('hintCount')) || 0;
+  document.getElementById('hintCount').textContent = hintCount;
+  const usedHints = new Set(JSON.parse(localStorage.getItem('usedHints')) || []);
 
   function getElapsed() {
     const start = localStorage.getItem('startTime');
@@ -202,12 +204,16 @@
   function useHint(id, text) {
     if (usedHints.has(id)) return;
     usedHints.add(id);
+    localStorage.setItem('usedHints', JSON.stringify(Array.from(usedHints)));
+
     if(hintCount < 5) {
       hintCount++;
+      localStorage.setItem('hintCount', hintCount);
     } else {
       alert('You can only use 5 hints total!');
       return;
     }
+
     document.getElementById('hintCount').textContent = hintCount;
     document.getElementById('hintText').textContent = text;
   }
@@ -237,7 +243,11 @@
     document.getElementById('finalHints').textContent = '💡 Hints Used: ' + hintCount;
     document.getElementById('finalGrade').textContent = '🏆 Grade: ' + grade;
 
-    localStorage.clear();
+    // Clear only game session items
+    localStorage.removeItem('startTime');
+    localStorage.removeItem('stoppedTime');
+    localStorage.removeItem('hintCount');
+    localStorage.removeItem('usedHints');
   }
 
   setInterval(update, 1000);
